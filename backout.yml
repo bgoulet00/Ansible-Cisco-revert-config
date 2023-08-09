@@ -1,0 +1,42 @@
+---
+- name: config backup and rollback
+  hosts: all
+  connection: local
+  gather_facts: no
+  
+  #change timer to desired number of minutes
+  #keep in mind running a play against a large number of hosts can take a while
+  vars:
+    timer: 5
+    
+   
+  tasks:
+  
+
+  - name: ensure archive feature is enabled
+    ios_config:
+      lines:
+        - 'path flash:config'
+        - maximum 5
+      parents: archive
+      
+  - name: archive the configuration
+    ios_command: 
+      commands: "archive config"
+       
+  - name: set the revert timer
+    ios_command: 
+      commands: "configure terminal revert timer {{timer}}"
+      
+    #make a config change here
+  - name: debug task placeholder for config change tasks
+    debug:
+      msg: "do some config stuff here"
+    
+  - name: commit the configuration
+    ios_command: 
+      commands: "configure confirm"
+      
+  - name: save config
+    ios_config:
+      save_when: always
